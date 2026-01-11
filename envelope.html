@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Envelope Animation</title>
+
+<style>
+:root {
+  --env-width: 190px;
+  --env-height: 125px;
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+  background: #ffd6e8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-family: 'Courier New', monospace;
+}
+
+/* ================= ENVELOPE ================= */
+.envelope {
+  width: var(--env-width);
+  height: var(--env-height);
+  position: absolute;
+  cursor: pointer;
+  z-index: 5;
+  perspective: 1000px;
+  transition: transform 1.6s cubic-bezier(.22,.61,.36,1);
+}
+
+/* Smooth move to bottom-left */
+.envelope.bottom-left {
+  transform: translate(
+    calc(-50vw + 110px),
+    calc(50vh - 110px)
+  ) scale(1.05);
+}
+
+/* BACK */
+.env-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: #f7b7d2;
+  border-radius: 6px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+}
+
+/* INNER PAPER SHADOW */
+.env-paper-shadow {
+  position: absolute;
+  width: 92%;
+  height: 90%;
+  background: linear-gradient(to bottom, #fff0f7, #f3c3da);
+  top: 5%;
+  left: 4%;
+  border-radius: 4px;
+  z-index: 1;
+}
+
+/* FRONT FOLDS */
+.env-front {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+}
+
+.env-left-fold {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-top: calc(var(--env-height) / 2) solid transparent;
+  border-bottom: calc(var(--env-height) / 2) solid transparent;
+  border-left: calc(var(--env-width) / 2) solid #f4a9c9;
+  left: 0;
+}
+
+.env-right-fold {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-top: calc(var(--env-height) / 2) solid transparent;
+  border-bottom: calc(var(--env-height) / 2) solid transparent;
+  border-right: calc(var(--env-width) / 2) solid #f19dc2;
+  right: 0;
+}
+
+.env-bottom-fold {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-left: calc(var(--env-width) / 2) solid transparent;
+  border-right: calc(var(--env-width) / 2) solid transparent;
+  border-bottom: calc(var(--env-height) / 2) solid #f6b1cf;
+  bottom: 0;
+}
+
+/* REALISTIC FLAP */
+.env-flap {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: #ee9fc4;
+  clip-path: polygon(0 0, 100% 0, 50% 55%);
+  top: 0;
+  left: 0;
+  transform-origin: 50% 0%;
+  transition: transform 1s ease;
+  z-index: 4;
+}
+
+.envelope.open .env-flap {
+  transform: rotateX(180deg);
+}
+
+/* ================= LETTER ================= */
+.letter {
+  width: min(105vw, 560px);
+  min-height: 220px;
+  background: #ffffff;
+  border-radius: 6px;
+  padding: 20px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+  position: absolute;
+  opacity: 0;
+  z-index: 3;
+  transform: translate(
+    calc(-50vw + 110px),
+    calc(50vh - 120px)
+  );
+  transition: transform 1.6s cubic-bezier(.22,.61,.36,1), opacity 0.8s ease;
+}
+
+.letter.peek {
+  opacity: 1;
+  transform: translate(
+    calc(-50vw + 110px),
+    calc(50vh - 220px)
+  );
+}
+
+.letter.center {
+  transform: translate(-50%, -50%);
+  top: 50%;
+  left: 50%;
+}
+
+/* TYPEWRITER */
+.typewriter {
+  white-space: pre-wrap;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* MOBILE */
+@media (max-width: 480px) {
+  :root {
+    --env-width: 160px;
+    --env-height: 110px;
+  }
+  .typewriter {
+    font-size: 15px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ENVELOPE -->
+<div class="envelope" id="envelope">
+  <div class="env-back"></div>
+  <div class="env-paper-shadow"></div>
+
+  <div class="env-front">
+    <div class="env-left-fold"></div>
+    <div class="env-right-fold"></div>
+    <div class="env-bottom-fold"></div>
+  </div>
+
+  <div class="env-flap"></div>
+</div>
+
+<!-- LETTER -->
+<div class="letter" id="letter">
+  <div class="typewriter" id="text"></div>
+</div>
+
+<script>
+const envelope = document.getElementById("envelope");
+const letter = document.getElementById("letter");
+const textEl = document.getElementById("text");
+
+const fillerText =
+`Dear Anna,
+
+Happy 18th Birthday 🌷
+
+I’ve been thinking about what to write for a while, because some people deserve words that are honest, careful, and real—and you’re one of them.
+
+You’ve been a part of my life for as long as I can remember. There were times when I truly thought my feelings for you had already faded, that they were just something from childhood that time had quietly taken away. But I eventually realized I was wrong. They never really left. They just stayed—quiet, patient, and constant.
+
+I’ve found myself wishing, more times than I can count, that maybe someday things would work out for us. You’ve appeared in my dreams countless times—dreams where we were together, happy, and at peace. I’d wake up smiling, holding onto that feeling a little longer before reality returned.
+
+I still remember the first time I ever gave someone a flower—and it was you. That moment never left my mind. Maybe that’s why pink tulips always remind me of you: soft and quietly beautiful.
+
+I’m really glad that after so long, we’re talking again. Even just as friends, it means more to me than you probably know. Having you back in my life, even in this simple way, feels like something I didn’t realize I was missing.
+
+Later today, I hope we have an amazing time together. I’ll do my best to make this one of the happiest—if not the happiest—birthdays you’ve ever had.
+
+Happy birthday, Anna.
+
+May your day be as lovely as pink tulips in bloom.
+
+— Deanver `;
+
+let typed = 0;
+
+envelope.addEventListener("click", () => {
+  envelope.classList.add("bottom-left");
+
+  setTimeout(() => {
+    envelope.classList.add("open");
+  }, 900);
+
+  setTimeout(() => {
+    letter.classList.add("peek");
+  }, 1300);
+
+  setTimeout(() => {
+    letter.classList.add("center");
+    startTyping();
+  }, 2200);
+});
+
+function startTyping() {
+  if (typed < fillerText.length) {
+    textEl.textContent += fillerText.charAt(typed);
+    typed++;
+    setTimeout(startTyping, 40);
+  }
+}
+</script>
+
+</body>
+</html>
