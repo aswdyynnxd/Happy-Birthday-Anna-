@@ -1,27 +1,129 @@
-canvas {
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-p {
-  margin: 0 0;
-  position: absolute;
-  font: 16px Verdana;
-  color: #eee;
-  height: 25px;
-  top: calc(100vh - 30px);
-  text-shadow: 0 0 2px white;
-}
-p a {
-  text-decoration: none;
-  color: #aaa;
-}
-span {
-  font-size: 11px;
-}
-p > a:first-of-type {
-  font-size: 20px;
-}
+/* ======================
+   GLOBAL
+====================== */
 body {
+  margin: 0;
   overflow: hidden;
+  font-family: sans-serif;
+  background: #111;
+}
+
+/* ======================
+   CANVAS (STAGE 1)
+====================== */
+canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+}
+
+/* ======================
+   HIDDEN HELPER
+====================== */
+.hidden {
+  display: none !important;
+}
+
+/* ======================
+   STAGE 2 (AFTER FIREWORKS)
+====================== */
+#stage2 {
+  position: fixed;
+  inset: 0;
+  background: #ffd6e8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 5; /* 👈 ABOVE CANVAS */
+}
+
+/* ======================
+   STAGE CONTENT
+====================== */
+.stage-container {
+  display: flex;
+  gap: 80px;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ======================
+   ITEM WRAPPER
+====================== */
+.item {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  cursor: pointer;
+  transition: transform 0.35s ease;
+  z-index: 2;
+}
+
+/* Hover scale animation */
+.item:hover {
+  transform: scale(1.15);
+}
+
+/* ======================
+   GLOW EFFECT
+====================== */
+.glow {
+  position: absolute;
+  inset: -30px;
+  background: radial-gradient(circle, #ff9acb 0%, transparent 70%);
+  filter: blur(22px);
+  opacity: 0.85;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ======================
+   ITEM CONTENT (IMAGE / CODED SHAPE)
+====================== */
+.item img {
+  position: relative;
+  width: 100%;
+  height: auto;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* ======================
+   BUTTONS
+====================== */
+.buttons {
+  margin-top: 25px;
+  display: flex;
+  gap: 15px;
+}
+
+button {
+  padding: 12px 22px;
+  font-size: 16px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  background: #ff7eb3;
+  color: white;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+button:hover {
+  transform: scale(1.08);
+  background: #ff5fa2;
+}
+
+/* ======================
+   MOBILE
+====================== */
+@media (max-width: 768px) {
+  .stage-container {
+    gap: 40px;
+  }
+
+  .item {
+    width: 130px;
+    height: 130px;
+  }
 }
