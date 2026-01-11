@@ -1,3 +1,5 @@
+let animationFinished = false;
+let rafId;
 let w = (c.width = window.innerWidth),
   h = (c.height = window.innerHeight),
   ctx = c.getContext("2d"),
@@ -5,7 +7,7 @@ let w = (c.width = window.innerWidth),
 (hh = h / 2),
   (opts = {
     // change the text in here //
-    strings: ["HAPPY", "BIRTHDAY!", "to You"],
+    strings: ["HAPPY", "BIRTHDAY!", "ANNA!"],
     charSize: 30,
     charSpacing: 35,
     lineHeight: 40,
@@ -354,22 +356,25 @@ function generateBalloonPath(x, y, size) {
 }
 
 function anim() {
-  window.requestAnimationFrame(anim);
-
-  ctx.fillStyle = "#111";
+  rafId = window.requestAnimationFrame(anim);
+  
+  ctx.fillStyle = "#ffd6e8"; // same as stage2 background
   ctx.fillRect(0, 0, w, h);
-
+  
   ctx.translate(hw, hh);
-
-  var done = true;
-  for (var l = 0; l < letters.length; ++l) {
+  
+  let done = true;
+  for (let l = 0; l < letters.length; ++l) {
     letters[l].step();
     if (letters[l].phase !== "done") done = false;
   }
-
+  
   ctx.translate(-hw, -hh);
-
-  if (done) for (var l = 0; l < letters.length; ++l) letters[l].reset();
+  
+  if (done && !animationFinished) {
+    animationFinished = true;
+    endStageOne();
+  }
 }
 
 for (let i = 0; i < opts.strings.length; ++i) {
@@ -399,3 +404,26 @@ window.addEventListener("resize", function () {
 
   ctx.font = opts.charSize + "px Verdana";
 });
+
+function endStageOne() {
+  cancelAnimationFrame(rafId);
+
+  c.style.transition = "opacity 1.2s";
+  c.style.opacity = 0;
+
+  setTimeout(() => {
+    c.style.display = "none";
+    document.getElementById("stage2").classList.remove("hidden");
+  }, 1200);
+}
+function goEnvelope() {
+  window.location.href = "envelope.html";
+}
+
+function goCake() {
+  window.location.href = "cake.html";
+}
+
+function goFlowers() {
+  window.location.href = "flowers.html";
+}
